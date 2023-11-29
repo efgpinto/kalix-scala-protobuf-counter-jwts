@@ -1,0 +1,98 @@
+// This is the public API offered by your entity.
+syntax = "proto3";
+
+package com.example;
+
+import "kalix/annotations.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+message CounterState {
+  int32 value = 1;
+}
+
+message ChangeCounterCmd {
+  option (kalix.message).jwt = {
+    validate_bearer_token: true // required do the tenant_id is extract from the bearer token
+  };
+
+  string counter_id = 1 [(kalix.field).entity_key = true];
+  string tenant_id = 2 [(kalix.field).entity_key = true,
+    (kalix.field).jwt = {
+      claim: EXTRACT
+      name: "ten"
+    }];
+
+  string sub = 3 [(kalix.field).jwt = {
+    claim: EXTRACT // this will only be validated if either present on the JWT or the command, otherwise its presence is not required
+  }];
+  int32 value = 4;
+}
+
+message GetCounter {
+  option (kalix.message).jwt = {
+    validate_bearer_token: true
+  };
+
+  string counter_id = 1 [(kalix.field).entity_key = true];
+  string tenant_id = 2 [(kalix.field).entity_key = true,
+    (kalix.field).jwt = {
+      claim: EXTRACT
+      name: "ten"
+    }];
+}
+
+message CurrentCounter {
+  int32 value = 1;
+}
+
+service CounterService {
+  option (kalix.codegen) = {
+    value_entity: {
+      name: "com.example.domain.Counter"
+      entity_type: "counter"
+      state: "com.example.CounterState"
+    }
+  };
+
+  option (kalix.service).jwt = {
+    validate: BEARER_TOKEN,
+    static_claim: {
+      claim: "roles"
+      value: "to-override" // as long as this role is made-up this is effectively a deny-by-default for this service
+    }
+  };
+
+  rpc Increase (ChangeCounterCmd) returns (google.protobuf.Empty) {
+    option (kalix.method).jwt = {
+      bearer_token_issuer: "my-issuer"
+      validate: BEARER_TOKEN,
+      validate: MESSAGE,
+      static_claim: {
+        claim: "roles"
+        value: "role1" // specific role to be able to call this endpoint
+      }
+    };
+  };
+
+  rpc Decrease (ChangeCounterCmd) returns (google.protobuf.Empty) {
+    option (kalix.method).jwt = {
+      bearer_token_issuer: "my-issuer"
+      validate: BEARER_TOKEN,
+      validate: MESSAGE,
+      static_claim: {
+        claim: "roles"
+        value: "role2" // specific role to be able to call this endpoint
+      }
+    };
+  }
+
+  rpc GetCurrentCounter (GetCounter) returns (CurrentCounter) {
+      // no static claim required, but we still need bearer token and extracting the tenant id
+      option (kalix.method).jwt = {
+        bearer_token_issuer: "my-issuer"
+        validate: BEARER_TOKEN,
+        validate: MESSAGE
+      };
+  };
+}
