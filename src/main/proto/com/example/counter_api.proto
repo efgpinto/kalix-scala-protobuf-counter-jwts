@@ -24,7 +24,7 @@ message ChangeCounterCmd {
     }];
 
   string sub = 3 [(kalix.field).jwt = {
-    claim: EXTRACT // this will only be validated if either present on the JWT or the command, otherwise its presence is not required
+    claim: INCLUDE // this will only be validated if either present on the JWT or the command, otherwise its presence is not required
   }];
   int32 value = 4;
 }
