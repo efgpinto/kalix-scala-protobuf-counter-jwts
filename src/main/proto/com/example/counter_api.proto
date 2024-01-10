@@ -13,7 +13,7 @@ message CounterState {
 
 message ChangeCounterCmd {
   option (kalix.message).jwt = {
-    validate_bearer_token: true // required do the tenant_id is extract from the bearer token
+    validate_bearer_token: true // required so the tenant_id is extract from the bearer token
   };
 
   string counter_id = 1 [(kalix.field).entity_key = true];
@@ -60,6 +60,10 @@ service CounterService {
     static_claim: {
       claim: "roles"
       value: "to-override" // as long as this role is made-up this is effectively a deny-by-default for this service
+    },
+    static_claim: {
+      claim: "sub"
+      pattern: "\\S+" // require sub to be non-empty
     }
   };
 
@@ -70,7 +74,11 @@ service CounterService {
       validate: MESSAGE,
       static_claim: {
         claim: "roles"
-        value: "role1" // specific role to be able to call this endpoint
+        value: ["role1", "role2"] // specific role to be able to call this endpoint
+      },
+      static_claim: { // this needs to be duplicated here since we are override the whole jwt definition
+        claim: "sub"
+        pattern: "\\S+" // require sub to be non-empty
       }
     };
   };
@@ -84,6 +92,8 @@ service CounterService {
         claim: "roles"
         value: "role2" // specific role to be able to call this endpoint
       }
+      // by not specifying the sub claim here, we are effectively allowing access without a sub claim present
+      // since service-level spec is overridden by method-level spec
     };
   }
 
