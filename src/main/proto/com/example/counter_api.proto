@@ -64,6 +64,10 @@ service CounterService {
     static_claim: {
       claim: "sub"
       pattern: "\\S+" // require sub to be non-empty
+    },
+    static_claim: {
+      claim: "ten"
+      value: "east" // require tenant_id to be "east"
     }
   };
 

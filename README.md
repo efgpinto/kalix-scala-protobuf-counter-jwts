@@ -28,7 +28,7 @@ Increase endpoint requires `ten` claim to be provided and a role "role1", JWT cl
 grpcurl --plaintext -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJteS1pc3N1ZXIiLCJ0ZW4iOiJlYXN0Iiwic3ViIjoiaGVsbG8xIiwicm9sZXMiOlsicm9sZTEiLCJyb2xlMiJdfQ' -d '{"counter_id": "1", "value": 10}' localhost:9000 com.example.CounterService/Increase
 ```
 
-> **NOTE**: we don't provide the tenant id on the body, but it still gets extract to the command to be part of the composite entity key.
+> **NOTE**: we don't provide the tenant id on the body, but it still gets extracted and placed into the command to be part of the composite entity key.
 
 Get endpoint requires `ten` to be provided but no role:
 ```json
@@ -78,4 +78,9 @@ grpcurl -v --plaintext -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6Ikp
 Decreasing with role1 instead of role2, fails:
 ```shell
 grpcurl --plaintext -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJteS1pc3N1ZXIiLCJ0ZW4iOiJlYXN0Iiwic3ViIjoiaGVsbG8xIiwicm9sZXMiOiJyb2xlMSJ9' -d '{"counter_id": "1", "value": 10}' localhost:9000 com.example.CounterService/Decrease
+```
+
+Wrong tenant in JWT, fails:
+```shell
+grpcurl -v --plaintext -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJteS1pc3N1ZXIiLCJ0ZW4iOiJub3JkIiwicm9sZXMiOlsicm9sZTEiLCJyb2xlMiJdLCJzdWIiOiJoZWxsbzEifQ' -d '{"counter_id": "1", "value": 10}' localhost:9000 com.example.CounterService/Increase
 ```

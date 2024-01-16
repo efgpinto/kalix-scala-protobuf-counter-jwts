@@ -33,7 +33,7 @@ class Counter(context: ValueEntityContext) extends AbstractCounter {
   override def decrease(currentState: CounterState, command: ChangeCounterCmd): ValueEntity.Effect[Empty] = {
     log.info("metadata: " + commandContext().metadata.jwtClaims.asMap) // used for debug purposes
     log.info("command: " + command)
-    if (command.value < 0) effects.error(s"Increase requires a positive value. It was [${command.value}].")
+    if (command.value < 0) effects.error(s"Decrease requires a positive value. It was [${command.value}].")
     else
       effects
         .updateState(currentState.copy(value = currentState.value - command.value))
