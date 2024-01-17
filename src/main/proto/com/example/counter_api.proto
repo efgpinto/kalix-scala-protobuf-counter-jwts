@@ -64,10 +64,6 @@ service CounterService {
     static_claim: {
       claim: "sub"
       pattern: "\\S+" // require sub to be non-empty
-    },
-    static_claim: {
-      claim: "ten"
-      value: "east" // require tenant_id to be "east"
     }
   };
 
@@ -83,6 +79,10 @@ service CounterService {
       static_claim: { // this needs to be duplicated here since we are override the whole jwt definition
         claim: "sub"
         pattern: "\\S+" // require sub to be non-empty
+      },
+      static_claim: {
+        claim: "ten"
+        value: "east" // require tenant_id to be "east"
       }
     };
   };
