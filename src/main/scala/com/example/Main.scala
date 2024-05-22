@@ -14,7 +14,8 @@ object Main {
     // If you prefer, you may remove this and manually register these components in a
     // `Kalix()` instance.
     KalixFactory.withComponents(
-      new Counter(_))
+      new Counter(_),
+      new TestServiceAction(_))
   }
 
   def main(args: Array[String]): Unit = {

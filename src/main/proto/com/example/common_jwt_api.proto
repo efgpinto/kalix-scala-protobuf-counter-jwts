@@ -1,0 +1,53 @@
+// This is the public API offered by your entity.
+syntax = "proto3";
+
+package com.example;
+
+import "kalix/annotations.proto";
+import "google/api/annotations.proto";
+import "google/protobuf/empty.proto";
+
+message NestedToken {
+  option (kalix.message).jwt = {validate_bearer_token: true};
+  string name = 1 [
+    (kalix.field).jwt = {
+      claim: EXTRACT
+      name: "name"
+    }
+  ];
+  string surname = 2 [
+    (kalix.field).jwt = {
+      claim: EXTRACT
+      name: "sur"
+    }
+  ];
+}
+
+message RequestWithJwt {
+  option (kalix.message).jwt = {validate_bearer_token: true};
+  optional NestedToken access_token_context = 1 [(kalix.field).jwt = { token: true }];
+}
+
+message GetValue {
+  string value = 1;
+}
+
+service TestService {
+  option (kalix.codegen) = {
+    action: {
+    }
+  };
+
+  option (kalix.service).jwt = {validate: BEARER_TOKEN};
+
+  rpc TestNested(RequestWithJwt) returns (GetValue) {
+    option (kalix.method).jwt = {
+      validate: BEARER_TOKEN
+      validate: MESSAGE
+      static_claim: {
+        claim: "role"
+        value: ["admin"]
+      }
+    };
+  }
+}

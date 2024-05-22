@@ -84,3 +84,10 @@ Wrong tenant in JWT, fails:
 ```shell
 grpcurl -v --plaintext -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJteS1pc3N1ZXIiLCJ0ZW4iOiJub3JkIiwicm9sZXMiOlsicm9sZTEiLCJyb2xlMiJdLCJzdWIiOiJoZWxsbzEifQ' -d '{"counter_id": "1", "value": 10}' localhost:9000 com.example.CounterService/Increase
 ```
+
+
+### Testing nested fields in JWT
+
+```shell
+grpcurl --plaintext -H 'Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJyb2xlIjoiYWRtaW4iLCJuYW1lIjoiZWR1YXJkbyIsInN1ciI6InBpbnRvIn0' -d '{"access_token_context":{}}' localhost:9000 com.example.TestService/TestNested
+```
